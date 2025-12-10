@@ -37,19 +37,20 @@ import { CompositeAuthGuard } from './common/guards/composite-auth.guard';
       signOptions: { expiresIn: '1h' },
     }),
 
-    // Database Configuration (Updated for Deployment)
+    // Database Configuration
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: process.env.DB_HOST,
-      port: parseInt(process.env.DB_PORT) || 5432,
-      username: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
+      // FIX 1: Add || '' to strings to handle undefined
+      host: process.env.DB_HOST || 'localhost',
+      // FIX 2: Handle parseInt safely
+      port: parseInt(process.env.DB_PORT || '5432'), 
+      username: process.env.DB_USER || 'postgres',
+      password: process.env.DB_PASSWORD || '',
+      database: process.env.DB_NAME || 'wallet_db',
       entities: [User, Wallet, ApiKey, Transaction], 
-      synchronize: true, // Keep true for this task
+      synchronize: true, 
       
-      // --- CRITICAL DEPLOYMENT FIX ---
-      // Only enable SSL if the host is NOT localhost
+      // SSL Logic
       ssl: process.env.DB_HOST !== 'localhost',
       extra: {
         ssl: process.env.DB_HOST !== 'localhost' 
@@ -58,13 +59,11 @@ import { CompositeAuthGuard } from './common/guards/composite-auth.guard';
       },
     }),
   ],
-  // Register your API Endpoints here
   controllers: [
     AuthController, 
     WalletController, 
     KeysController
   ],
-  // Register your Logic/Services here
   providers: [
     AuthService, 
     WalletService, 
