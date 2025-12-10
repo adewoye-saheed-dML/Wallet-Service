@@ -1,4 +1,4 @@
-# 👛 HNG Wallet Service
+# HNG Wallet Service
 
 A battle-tested, secure backend wallet service built with NestJS. This application provides a complete financial system including user authentication (Google OAuth2), automated wallet creation, secure deposits via Paystack, atomic fund transfers, and a dual-authentication system using JWTs and API Keys.
 
