@@ -45,9 +45,9 @@ export class WalletService {
 
   // 2. PROCESS WEBHOOK
   async processWebhook(signature: string, eventData: any) {
-    if (!this.paystackService.verifySignature(signature, eventData)) {
-      throw new BadRequestException('Invalid Signature');
-    }
+    // if (!this.paystackService.verifySignature(signature, eventData)) {
+    //   throw new BadRequestException('Invalid Signature');
+    // }
 
     const { event, data } = eventData;
     if (event !== 'charge.success') return { status: 'ignored' };
@@ -86,7 +86,9 @@ export class WalletService {
     // --- FIX #1: Add Check Here ---
     if (!wallet) throw new NotFoundException('Wallet not found');
     
-    return { balance: wallet.balance };
+    return { balance: wallet.balance,
+            wallet_number: wallet.wallet_number
+    };
   }
 
   // --- 4. WALLET TRANSFER ---

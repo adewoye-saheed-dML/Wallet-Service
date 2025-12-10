@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
+import { JwtStrategy } from './auth/jwt.strategy';
 
 // 1. Import Entities
 import { User } from './database/user.entity';
@@ -58,6 +59,10 @@ import { CompositeAuthGuard } from './common/guards/composite-auth.guard';
           : null,
       },
     }),
+
+    // --- FIX FOR UNKNOWN DEPENDENCIES ---
+    // This creates the repositories so AuthService and others can use them
+    TypeOrmModule.forFeature([User, Wallet, ApiKey, Transaction]), 
   ],
   controllers: [
     AuthController, 
@@ -70,6 +75,7 @@ import { CompositeAuthGuard } from './common/guards/composite-auth.guard';
     KeysService, 
     PaystackService,
     GoogleStrategy,
+    JwtStrategy,
     CompositeAuthGuard
   ],
 })

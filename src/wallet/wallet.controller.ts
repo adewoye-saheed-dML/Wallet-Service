@@ -42,6 +42,7 @@ export class WalletController {
   // Notice: NO @UseGuards here. This allows Paystack to call it.
   @Post('paystack/webhook')
   @ApiOperation({ summary: 'Paystack Webhook (Mandatory)' })
+  @ApiBody({ schema: { example: { event: 'charge.success', data: { reference: 'REF-123', amount: 500000 } } } })
   async webhook(@Headers('x-paystack-signature') signature: string, @Body() body: any) {
     // The service handles signature validation security
     return this.walletService.processWebhook(signature, body);
