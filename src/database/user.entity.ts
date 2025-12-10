@@ -11,6 +11,9 @@ export class User {
   email: string;
 
   @Column({ nullable: true })
+  full_name: string;
+
+  @Column({ nullable: true })
   googleId: string; 
 
   @OneToOne(() => Wallet, (wallet) => wallet.user)
