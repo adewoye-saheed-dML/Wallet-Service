@@ -10,12 +10,18 @@ export class AuthController {
 
   @Get('google')
   @UseGuards(AuthGuard('google'))
-  @ApiOperation({ summary: 'Triggers Google Sign-In' })
+  @ApiOperation({ 
+    summary: 'Triggers Google Sign-In',
+    description: 'Redirects the user to the Google OAuth2 login page to initiate authentication.' // <--- Added
+  })
   async googleAuth(@Req() req) {}
 
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
-  @ApiOperation({ summary: 'Logs in user and returns JWT' })
+  @ApiOperation({ 
+    summary: 'Logs in user and returns JWT',
+    description: 'Handles the callback from Google, creates the user/wallet if they do not exist, and returns a JWT access token + user details.' // <--- Added
+  })
   googleAuthRedirect(@Req() req) {
     return this.authService.googleLogin(req);
   }

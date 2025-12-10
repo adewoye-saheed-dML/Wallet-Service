@@ -12,7 +12,10 @@ export class KeysController {
 
   // ENDPOINT: Create API Key
   @Post('create')
-  @ApiOperation({ summary: 'Create a new API Key with permissions' })
+  @ApiOperation({ 
+    summary: 'Create a new API Key',
+    description: 'Generates a secure API key with specific permissions (read, deposit, transfer) and an expiration time.' 
+  })
   @ApiBody({ schema: { example: { name: 'service-a', permissions: ['deposit'], expiry: '1D' } } })
   async createKey(@Req() req, @Body() body: { name: string; permissions: string[]; expiry: string }) {
     // Strict Input Validation
@@ -27,7 +30,10 @@ export class KeysController {
 
   // ENDPOINT: Rollover Expired API Key
   @Post('rollover')
-  @ApiOperation({ summary: 'Replaced an expired key with a new one' })
+  @ApiOperation({ 
+    summary: 'Rollover Expired API Key',
+    description: 'Invalidates an old/expired key and issues a new one with the exact same permissions.' 
+  })
   @ApiBody({ schema: { example: { expired_key_id: 'uuid-here', expiry: '1M' } } })
   async rolloverKey(@Req() req, @Body() body: { expired_key_id: string; expiry: string }) {
     // Strict Input Validation

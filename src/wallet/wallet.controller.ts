@@ -8,17 +8,19 @@ export const RequirePermission = (perm: string) => SetMetadata('permission', per
 
 @ApiTags('Wallet')
 @Controller('wallet')
-
 export class WalletController {
   constructor(private readonly walletService: WalletService) {}
 
   // --- 1. DEPOSIT (Protected) ---
   @Post('deposit')
-  @UseGuards(CompositeAuthGuard) // <--- Guard added specifically here
+  @UseGuards(CompositeAuthGuard)
   @RequirePermission('deposit')
   @ApiBearerAuth('JWT-auth')
   @ApiSecurity('API-Key')
-  @ApiOperation({ summary: 'Initialize Paystack Deposit' })
+  @ApiOperation({ 
+    summary: 'Initialize Paystack Deposit',
+    description: 'Generates a payment link from Paystack. The user must visit this link to complete the payment.' 
+  })
   @ApiBody({ schema: { example: { amount: 5000 } } })
   async deposit(@Req() req, @Body() body: { amount: number }) {
     if (body.amount <= 0) throw new BadRequestException('Amount must be positive');
@@ -29,11 +31,14 @@ export class WalletController {
 
   // --- 2. BALANCE (Protected) ---
   @Get('balance')
-  @UseGuards(CompositeAuthGuard) // <--- Guard added specifically here
+  @UseGuards(CompositeAuthGuard)
   @RequirePermission('read')
   @ApiBearerAuth('JWT-auth')
   @ApiSecurity('API-Key')
-  @ApiOperation({ summary: 'Get Wallet Balance' })
+  @ApiOperation({ 
+    summary: 'Get Wallet Balance',
+    description: 'Retrieves the current available balance and wallet number for the authenticated user.' 
+  })
   async getBalance(@Req() req) {
     return this.walletService.getBalance(req.user);
   }
@@ -41,7 +46,10 @@ export class WalletController {
   // --- 3. WEBHOOK (Public) ---
   // Notice: NO @UseGuards here. This allows Paystack to call it.
   @Post('paystack/webhook')
-  @ApiOperation({ summary: 'Paystack Webhook (Mandatory)' })
+  @ApiOperation({ 
+    summary: 'Paystack Webhook (Mandatory)',
+    description: 'Receives payment events from Paystack. Verifies the signature and credits the wallet if the payment was successful.' 
+  })
   @ApiBody({ schema: { example: { event: 'charge.success', data: { reference: 'REF-123', amount: 500000 } } } })
   async webhook(@Headers('x-paystack-signature') signature: string, @Body() body: any) {
     // The service handles signature validation security
@@ -54,7 +62,10 @@ export class WalletController {
   @RequirePermission('transfer')
   @ApiBearerAuth('JWT-auth')
   @ApiSecurity('API-Key')
-  @ApiOperation({ summary: 'Transfer funds to another user' })
+  @ApiOperation({ 
+    summary: 'Transfer funds to another user',
+    description: 'Moves funds from the authenticated user\'s wallet to the recipient\'s wallet using an ACID-compliant transaction.' 
+  })
   @ApiBody({ schema: { example: { wallet_number: '1234567890', amount: 3000 } } })
   async transfer(@Req() req, @Body() body: { wallet_number: string; amount: number }) {
     return this.walletService.transferFunds(req.user, body.wallet_number, body.amount);
@@ -66,7 +77,10 @@ export class WalletController {
   @RequirePermission('read')
   @ApiBearerAuth('JWT-auth')
   @ApiSecurity('API-Key')
-  @ApiOperation({ summary: 'View transaction history' })
+  @ApiOperation({ 
+    summary: 'View transaction history',
+    description: 'Returns a list of all deposits and transfers (credits and debits) associated with this wallet.' 
+  })
   async getHistory(@Req() req) {
     return this.walletService.getHistory(req.user);
   }
