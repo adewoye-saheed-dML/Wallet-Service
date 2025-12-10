@@ -11,7 +11,7 @@ export class PaystackService {
       email,
       amount: amount * 100, 
       reference,
-      callback_url: 'http://localhost:3000/api', // Redirect user here after payment
+      callback_url: process.env.PAYSTACK_CALLBACK_URL || 'http://localhost:3000/api',
     };
 
     try {

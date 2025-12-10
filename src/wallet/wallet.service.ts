@@ -45,9 +45,9 @@ export class WalletService {
 
   // 2. PROCESS WEBHOOK
   async processWebhook(signature: string, eventData: any) {
-    // if (!this.paystackService.verifySignature(signature, eventData)) {
-    //   throw new BadRequestException('Invalid Signature');
-    // }
+    if (!this.paystackService.verifySignature(signature, eventData)) {
+      throw new BadRequestException('Invalid Signature');
+    }
 
     const { event, data } = eventData;
     if (event !== 'charge.success') return { status: 'ignored' };
