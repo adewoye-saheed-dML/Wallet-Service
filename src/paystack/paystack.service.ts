@@ -11,7 +11,7 @@ export class PaystackService {
       email,
       amount: amount * 100, 
       reference,
-      callback_url: 'http://localhost:3000/api/docs', // Redirect user here after payment
+      callback_url: 'https://wallet-service-39uzbq.fly.dev/api', // Redirect user here after payment
     };
 
     try {

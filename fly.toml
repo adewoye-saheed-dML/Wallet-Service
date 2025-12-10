@@ -1,23 +1,19 @@
-# fly.toml app configuration file generated for wallet-service-39uzbq on 2025-12-10T05:56:59Z
-#
-# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
-#
+# 1. YOUR REAL APP NAME (From your logs)
+app = "wallet-service-39uzbq"
 
-app = 'wallet-service-39uzbq'
-primary_region = 'jnb'
-
+# 2. Tell Fly explicitly to use the Dockerfile
 [build]
+  dockerfile = "Dockerfile"
 
+# 3. Networking configuration
 [http_service]
   internal_port = 8080
   force_https = true
-  auto_stop_machines = 'stop'
+  auto_stop_machines = true
   auto_start_machines = true
-  min_machines_running = 0
-  processes = ['app']
+  min_machines_running = 1
+  processes = ["app"]
 
-[[vm]]
-  memory = '1gb'
-  cpu_kind = 'shared'
-  cpus = 1
-  memory_mb = 1024
+# 4. Environment settings
+[env]
+  PORT = "8080"
