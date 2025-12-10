@@ -123,6 +123,7 @@ Full interactive documentation is available via Swagger at `/api`.
 
 ### **Wallet Operations**
 * `GET /wallet/balance` - View wallet balance (Requires Auth).
+*  `GET /wallet/deposit/:reference/status` - Verify the status of a specific deposit transaction (ReadOnly).
 * `POST /wallet/deposit` - Initialize a deposit via Paystack.
 * `POST /wallet/transfer` - Transfer funds to another user's wallet.
 * `GET /wallet/transactions` - View deposit and transfer history.
@@ -131,7 +132,7 @@ Full interactive documentation is available via Swagger at `/api`.
 ### **API Key Management**
 * `POST /keys/create` - Generate a new API Key with scopes.
 * `POST /keys/rollover` - Invalidate an old key and generate a new one.
-
+* `DELETE /keys/:id` - Revoke (deactivate) an API Key manually.
 ---
 
 ## Database Schema
@@ -145,6 +146,7 @@ erDiagram
     User {
         uuid id PK
         string email
+        string full_name
         string googleId
     }
     Wallet {
