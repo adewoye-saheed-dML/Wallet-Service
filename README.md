@@ -74,7 +74,7 @@ To run this project, you need to configure the following environment variables.
 
 1.  **Clone the repository:**
     ```
-    git clone [https://github.com/adewoye-saheed-dML/Wallet-Service.git](https://github.com/adewoye-saheed-dML/Wallet-Service.git)
+    git clone https://github.com/adewoye-saheed-dML/Wallet-Service.git
     cd Wallet-Service
     ```
 
