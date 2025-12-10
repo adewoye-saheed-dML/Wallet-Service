@@ -1,0 +1,19 @@
+# 1. YOUR REAL APP NAME (From your logs)
+app = "wallet-service-39uzbq"
+
+# 2. Tell Fly explicitly to use the Dockerfile
+[build]
+  dockerfile = "Dockerfile"
+
+# 3. Networking configuration
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ["app"]
+
+# 4. Environment settings
+[env]
+  PORT = "8080"
