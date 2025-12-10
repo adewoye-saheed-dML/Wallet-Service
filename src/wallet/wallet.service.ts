@@ -180,4 +180,19 @@ export class WalletService {
       direction: tx.sender_wallet?.id === wallet.id ? 'debit' : 'credit',
     }));
   }
+
+// Verify Deposit Status
+async verifyDepositStatus(reference: string) {
+  const transaction = await this.transactionRepo.findOne({
+    where: { reference },
+  });
+
+  if (!transaction) throw new NotFoundException('Transaction not found');
+
+  return {
+    reference: transaction.reference,
+    status: transaction.status,
+    amount: transaction.amount,
+  };
+};
 }

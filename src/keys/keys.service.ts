@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { ApiKey } from '../database/api-key.entity';
 import { User } from '../database/user.entity';
 import { randomBytes } from 'crypto';
+import { NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class KeysService {
@@ -71,5 +72,19 @@ export class KeysService {
     // 5. Rule: "expiry must again be converted to a new expires_at value."
     // We reuse the createKey logic we wrote earlier
     return this.createKey(user, oldKey.name, oldKey.permissions, newExpiryStr);
+  }
+
+  // Revoke API Key
+  async revokeKey(user: any, keyId: string) {
+    const key = await this.apiKeyRepo.findOne({
+      where: { id: keyId, user: { id: user.id } },
+    });
+
+    if (!key) throw new NotFoundException('API Key not found or does not belong to user');
+
+    key.is_active = false;
+    await this.apiKeyRepo.save(key);
+
+    return { message: 'API Key revoked successfully' };
   }
 }

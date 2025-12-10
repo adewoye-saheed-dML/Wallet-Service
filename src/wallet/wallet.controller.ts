@@ -2,6 +2,7 @@ import { Controller, Post, Body, Get, Req, UseGuards, Headers, BadRequestExcepti
 import { WalletService } from './wallet.service';
 import { CompositeAuthGuard } from '../common/guards/composite-auth.guard';
 import { ApiBearerAuth, ApiSecurity, ApiTags, ApiOperation, ApiBody } from '@nestjs/swagger';
+import { Param } from '@nestjs/common';
 
 // We keep the helper decorator here
 export const RequirePermission = (perm: string) => SetMetadata('permission', perm);
@@ -25,7 +26,10 @@ export class WalletController {
   async deposit(@Req() req, @Body() body: { amount: number }) {
     if (body.amount <= 0) throw new BadRequestException('Amount must be positive');
     
-    // req.user is populated by CompositeAuthGuard
+    if (!Number.isInteger(body.amount)) {
+        throw new BadRequestException('Amount must be an integer (no decimals)');
+      }
+
     return this.walletService.initiateDeposit(req.user, body.amount);
   }
 
@@ -68,6 +72,13 @@ export class WalletController {
   })
   @ApiBody({ schema: { example: { wallet_number: '1234567890', amount: 3000 } } })
   async transfer(@Req() req, @Body() body: { wallet_number: string; amount: number }) {
+    if (body.amount <= 0) throw new BadRequestException('Amount must be positive');
+
+    // Integer Check
+    if (!Number.isInteger(body.amount)) {
+      throw new BadRequestException('Amount must be an integer (no decimals)');
+    }
+    
     return this.walletService.transferFunds(req.user, body.wallet_number, body.amount);
   }
 
@@ -83,5 +94,18 @@ export class WalletController {
   })
   async getHistory(@Req() req) {
     return this.walletService.getHistory(req.user);
+  }
+
+  // Verify Deposit Status Endpoint
+  @Get('deposit/:reference/status')
+  @UseGuards(CompositeAuthGuard) 
+  @ApiBearerAuth('JWT-auth')
+  @ApiSecurity('API-Key')
+  @ApiOperation({ 
+    summary: 'Verify Deposit Status', 
+    description: 'Checks the status of a deposit transaction by its reference.' 
+  })
+  async verifyStatus(@Param('reference') reference: string) {
+    return this.walletService.verifyDepositStatus(reference);
   }
 }

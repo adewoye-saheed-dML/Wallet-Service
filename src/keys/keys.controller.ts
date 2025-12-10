@@ -2,6 +2,7 @@ import { Controller, Post, Body, Req, UseGuards, BadRequestException } from '@ne
 import { KeysService } from './keys.service';
 import { CompositeAuthGuard } from '../common/guards/composite-auth.guard';
 import { ApiBearerAuth, ApiOperation, ApiTags, ApiBody } from '@nestjs/swagger';
+import { Delete, Param } from '@nestjs/common';
 
 @ApiTags('API Keys')
 @Controller('keys')
@@ -43,5 +44,15 @@ export class KeysController {
     }
 
     return this.keysService.rolloverKey(req.user, body.expired_key_id, body.expiry);
+  }
+
+  // Revoke Endpoint
+  @Delete(':id')
+  @ApiOperation({ 
+    summary: 'Revoke an API Key', 
+    description: 'Deactivates an API key so it can no longer be used.' 
+  })
+  async revokeKey(@Req() req, @Param('id') id: string) {
+    return this.keysService.revokeKey(req.user, id);
   }
 }
