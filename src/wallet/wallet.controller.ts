@@ -4,7 +4,7 @@ import { CompositeAuthGuard } from '../common/guards/composite-auth.guard';
 import { ApiBearerAuth, ApiSecurity, ApiTags, ApiOperation, ApiBody } from '@nestjs/swagger';
 import { Param } from '@nestjs/common';
 
-// We keep the helper decorator here
+
 export const RequirePermission = (perm: string) => SetMetadata('permission', perm);
 
 @ApiTags('Wallet')
@@ -12,7 +12,7 @@ export const RequirePermission = (perm: string) => SetMetadata('permission', per
 export class WalletController {
   constructor(private readonly walletService: WalletService) {}
 
-  // --- 1. DEPOSIT (Protected) ---
+  // ---- DEPOSIT (Protected) ---
   @Post('deposit')
   @UseGuards(CompositeAuthGuard)
   @RequirePermission('deposit')
@@ -24,11 +24,10 @@ export class WalletController {
   })
   @ApiBody({ schema: { example: { amount: 5000 } } })
   async deposit(@Req() req, @Body() body: { amount: number }) {
-    // 1. Integer Check
     if (!Number.isInteger(body.amount)) {
       throw new BadRequestException('Amount must be an integer (no decimals)');
     }
-    // 2. Minimum Amount Check
+
     if (body.amount < 100) {
       throw new BadRequestException('Minimum deposit amount is 100');
     }
@@ -37,7 +36,7 @@ export class WalletController {
   }
 
 
-  // --- 2. BALANCE (Protected) ---
+  // ---  BALANCE (Protected) ---
   @Get('balance')
   @UseGuards(CompositeAuthGuard)
   @RequirePermission('read')
@@ -51,20 +50,18 @@ export class WalletController {
     return this.walletService.getBalance(req.user);
   }
 
-  // --- 3. WEBHOOK (Public) ---
-  // Notice: NO @UseGuards here. This allows Paystack to call it.
+  // ---  WEBHOOK (Public) ---
   @Post('paystack/webhook')
   @ApiOperation({ 
-    summary: 'Paystack Webhook (Mandatory)',
+    summary: 'Paystack Webhook',
     description: 'Receives payment events from Paystack. Verifies the signature and credits the wallet if the payment was successful.' 
   })
   @ApiBody({ schema: { example: { event: 'charge.success', data: { reference: 'REF-123', amount: 500000 } } } })
   async webhook(@Headers('x-paystack-signature') signature: string, @Body() body: any) {
-    // The service handles signature validation security
     return this.walletService.processWebhook(signature, body);
   }
 
-  // --- 4. TRANSFER (Protected) ---
+  // ---  TRANSFER (Protected) ---
   @Post('transfer')
   @UseGuards(CompositeAuthGuard)
   @RequirePermission('transfer')
@@ -76,11 +73,11 @@ export class WalletController {
   })
   @ApiBody({ schema: { example: { wallet_number: '1234567890', amount: 3000 } } })
   async transfer(@Req() req, @Body() body: { wallet_number: string; amount: number }) {
-    // 1. Integer Check
+ 
     if (!Number.isInteger(body.amount)) {
       throw new BadRequestException('Amount must be an integer (no decimals)');
     }
-    // 2. Minimum Amount Check
+
     if (body.amount < 100) {
       throw new BadRequestException('Minimum transfer amount is 100');
     }
@@ -88,7 +85,7 @@ export class WalletController {
     return this.walletService.transferFunds(req.user, body.wallet_number, body.amount);
   }
 
-  // --- 5. HISTORY (Protected) ---
+  // ---  HISTORY (Protected) ---
   @Get('transactions')
   @UseGuards(CompositeAuthGuard)
   @RequirePermission('read')
@@ -102,7 +99,7 @@ export class WalletController {
     return this.walletService.getHistory(req.user);
   }
 
-  // Verify Deposit Status Endpoint
+
   @Get('deposit/:reference/status')
   @UseGuards(CompositeAuthGuard) 
   @ApiBearerAuth('JWT-auth')

@@ -3,7 +3,7 @@ import axios from 'axios';
 
 @Injectable()
 export class PaystackService {
-  private readonly secretKey = process.env.PAYSTACK_SECRET_KEY; // Ensure this is in .env
+  private readonly secretKey = process.env.PAYSTACK_SECRET_KEY; 
 
   async initializeTransaction(email: string, amount: number, reference: string) {
     // Paystack expects amount in Kobo (multiply by 100)
@@ -25,13 +25,13 @@ export class PaystackService {
           },
         },
       );
-      return response.data.data; // Contains authorization_url
+      return response.data.data; 
     } catch (error) {
       throw new BadRequestException('Paystack initialization failed');
     }
   }
 
-  // Utility to verify webhook signature (we will use this in the controller)
+  // Utility to verify webhook signature 
   verifySignature(signature: string, body: any): boolean {
     const crypto = require('crypto');
     const hash = crypto

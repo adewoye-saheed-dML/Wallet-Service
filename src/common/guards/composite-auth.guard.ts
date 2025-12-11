@@ -5,7 +5,7 @@ import {
     UnauthorizedException,
     ForbiddenException,
   } from '@nestjs/common';
-  import { AuthGuard } from '@nestjs/passport'; // Standard JWT Guard
+  import { AuthGuard } from '@nestjs/passport'; 
   import { KeysService } from '../../keys/keys.service';
   import { Reflector } from '@nestjs/core';
   
@@ -35,7 +35,7 @@ import {
   
         // Attach user to request so the controller thinks a user is logged in
         request.user = keyEntity.user; 
-        request.isApiKey = true; // Flag for audit logs if needed
+        request.isApiKey = true; 
         return true;
       }
   

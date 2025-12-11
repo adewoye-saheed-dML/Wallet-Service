@@ -15,7 +15,7 @@ export class WalletService {
     private dataSource: DataSource,
   ) {}
 
-  // 1. INITIATE DEPOSIT
+  //  INITIATE DEPOSIT
   async initiateDeposit(user: any, amount: number) {
     const wallet = await this.walletRepo.findOne({ where: { user: { id: user.id } } });
     if (!wallet) throw new NotFoundException('Wallet not found');
@@ -43,7 +43,7 @@ export class WalletService {
     };
   }
 
-  // 2. PROCESS WEBHOOK
+  //  PROCESS WEBHOOK
   async processWebhook(signature: string, eventData: any) {
     if (!this.paystackService.verifySignature(signature, eventData)) {
       throw new BadRequestException('Invalid Signature');
@@ -70,7 +70,7 @@ export class WalletService {
     await this.transactionRepo.save(transaction);
 
     const wallet = transaction.receiver_wallet;
-    // Safety check here (though unlikely if transaction exists)
+    // Safety check here
     if (wallet) {
         wallet.balance = Number(wallet.balance) + Number(amountPaid);
         await this.walletRepo.save(wallet);
@@ -79,11 +79,10 @@ export class WalletService {
     return { status: 'success' };
   }
 
-  // 3. GET BALANCE
+  //  GET BALANCE
   async getBalance(user: any) {
     const wallet = await this.walletRepo.findOne({ where: { user: { id: user.id } } });
-    
-    // --- FIX #1: Add Check Here ---
+   
     if (!wallet) throw new NotFoundException('Wallet not found');
     
     return { balance: wallet.balance,
@@ -91,7 +90,7 @@ export class WalletService {
     };
   }
 
-  // --- 4. WALLET TRANSFER ---
+  // ---  WALLET TRANSFER ---
   async transferFunds(senderUser: any, receiverWalletNumber: string, amount: number) {
     if (amount <= 0) throw new BadRequestException('Amount must be positive');
 
@@ -104,12 +103,10 @@ export class WalletService {
         where: { user: { id: senderUser.id } },
       });
 
-      // --- FIX #2: Add Check Here ---
       if (!senderWallet) {
           throw new NotFoundException('Sender wallet not found');
       }
 
-      // Now it is safe to access .balance
       if (Number(senderWallet.balance) < amount) {
         throw new BadRequestException('Insufficient funds');
       }
@@ -154,14 +151,12 @@ export class WalletService {
     }
   }
 
-  // --- 5. TRANSACTION HISTORY ---
+  // ---  TRANSACTION HISTORY ---
   async getHistory(user: any) {
     const wallet = await this.walletRepo.findOne({ where: { user: { id: user.id } } });
 
-    // --- FIX #3: Add Check Here ---
     if (!wallet) throw new NotFoundException('Wallet not found');
 
-    // Now it is safe to access wallet.id
     const transactions = await this.transactionRepo.find({
       where: [
         { sender_wallet: { id: wallet.id } },

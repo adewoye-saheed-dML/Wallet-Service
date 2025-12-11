@@ -17,39 +17,34 @@ export class AuthService {
   async googleLogin(req) {
     if (!req.user) return 'No user from google';
 
-    // 1. Check if user exists (FETCH WITH WALLET)
+    // Check if user exists 
     let user = await this.userRepo.findOne({ 
       where: { email: req.user.email },
-      relations: ['wallet'] // <--- Crucial: Load the wallet data
+      relations: ['wallet'] 
     });
 
-    // 2. If not, CREATE User AND Wallet
+    
     if (!user) {
-      // Create Wallet first
       const newWallet = this.walletRepo.create({
         wallet_number: randomBytes(5).toString('hex'),
         balance: 0,
       });
       await this.walletRepo.save(newWallet);
 
-      // Create User linked to Wallet
+
       user = this.userRepo.create({
         email: req.user.email,
-        full_name: req.user.full_name, // Save the name from Google
+        full_name: req.user.full_name, 
         googleId: req.user.googleId,
         wallet: newWallet,
       });
       await this.userRepo.save(user);
-      
-      // Manually attach wallet to user object for the response below
       user.wallet = newWallet;
     }
 
-    // 3. Generate Token
+  //  Generate Token
     const payload = { sub: user.id, email: user.email };
     const accessToken = this.jwtService.sign(payload);
-
-    // 4. Return the Rich Response
     return {
       user: {
         id: user.id,

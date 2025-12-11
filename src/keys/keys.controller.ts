@@ -6,12 +6,12 @@ import { Delete, Param } from '@nestjs/common';
 
 @ApiTags('API Keys')
 @Controller('keys')
-@UseGuards(CompositeAuthGuard) // Needed so we know WHICH user is creating the key
+@UseGuards(CompositeAuthGuard) 
 @ApiBearerAuth('JWT-auth') 
 export class KeysController {
   constructor(private readonly keysService: KeysService) {}
 
-  // ENDPOINT: Create API Key
+  // ENDPOINTS
   @Post('create')
   @ApiOperation({ 
     summary: 'Create a new API Key',
@@ -19,17 +19,14 @@ export class KeysController {
   })
   @ApiBody({ schema: { example: { name: 'service-a', permissions: ['deposit'], expiry: '1D' } } })
   async createKey(@Req() req, @Body() body: { name: string; permissions: string[]; expiry: string }) {
-    // Strict Input Validation
     const validExpiry = ['1H', '1D', '1M', '1Y'];
     if (!validExpiry.includes(body.expiry)) {
       throw new BadRequestException('Expiry must be 1H, 1D, 1M, or 1Y');
     }
-    
-    // User is attached to req by the Guard we built earlier
     return this.keysService.createKey(req.user, body.name, body.permissions, body.expiry);
   }
 
-  // ENDPOINT: Rollover Expired API Key
+  
   @Post('rollover')
   @ApiOperation({ 
     summary: 'Rollover Expired API Key',
@@ -37,16 +34,14 @@ export class KeysController {
   })
   @ApiBody({ schema: { example: { expired_key_id: 'uuid-here', expiry: '1M' } } })
   async rolloverKey(@Req() req, @Body() body: { expired_key_id: string; expiry: string }) {
-    // Strict Input Validation
     const validExpiry = ['1H', '1D', '1M', '1Y'];
     if (!validExpiry.includes(body.expiry)) {
       throw new BadRequestException('Expiry must be 1H, 1D, 1M, or 1Y');
     }
-
     return this.keysService.rolloverKey(req.user, body.expired_key_id, body.expiry);
   }
 
-  // Revoke Endpoint
+ 
   @Delete(':id')
   @ApiOperation({ 
     summary: 'Revoke an API Key', 

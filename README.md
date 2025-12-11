@@ -11,6 +11,12 @@ A battle-tested, secure backend wallet service built with NestJS. This applicati
 
 ---
 
+## System Design 
+
+<img width="8662" height="7115" alt="Image" src="https://github.com/user-attachments/assets/7fabfcf4-f531-46c4-81ef-353f74f694be" />
+
+---
+
 ## Key Features
 
 ### **Authentication & Security**
