@@ -24,14 +24,18 @@ export class WalletController {
   })
   @ApiBody({ schema: { example: { amount: 5000 } } })
   async deposit(@Req() req, @Body() body: { amount: number }) {
-    if (body.amount <= 0) throw new BadRequestException('Amount must be positive');
-    
+    // 1. Integer Check
     if (!Number.isInteger(body.amount)) {
-        throw new BadRequestException('Amount must be an integer (no decimals)');
-      }
-
+      throw new BadRequestException('Amount must be an integer (no decimals)');
+    }
+    // 2. Minimum Amount Check
+    if (body.amount < 100) {
+      throw new BadRequestException('Minimum deposit amount is 100');
+    }
+    
     return this.walletService.initiateDeposit(req.user, body.amount);
   }
+
 
   // --- 2. BALANCE (Protected) ---
   @Get('balance')
@@ -72,13 +76,15 @@ export class WalletController {
   })
   @ApiBody({ schema: { example: { wallet_number: '1234567890', amount: 3000 } } })
   async transfer(@Req() req, @Body() body: { wallet_number: string; amount: number }) {
-    if (body.amount <= 0) throw new BadRequestException('Amount must be positive');
-
-    // Integer Check
+    // 1. Integer Check
     if (!Number.isInteger(body.amount)) {
       throw new BadRequestException('Amount must be an integer (no decimals)');
     }
-    
+    // 2. Minimum Amount Check
+    if (body.amount < 100) {
+      throw new BadRequestException('Minimum transfer amount is 100');
+    }
+
     return this.walletService.transferFunds(req.user, body.wallet_number, body.amount);
   }
 
